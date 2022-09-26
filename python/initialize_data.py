@@ -7,9 +7,6 @@ file_path = '../initial_data/sim.xml'
 conn = pg.connect("dbname='tyler' user='tyler' host='localhost' password='tyler'")
 
 
-
-
-
 #cur.execute(query, data)
 #conn.commit()
 

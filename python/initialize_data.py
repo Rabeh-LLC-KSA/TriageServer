@@ -29,7 +29,7 @@ for line in f:
 		data = (count,root.attrib["id"],root.attrib["simstep"],root.attrib["x"],root.attrib["y"])
 		cur.execute(query, data)
 		count += 1
-		conn.commit()
+		conn.commit() 
 	except ET.ParseError:
 		print 'err'
 	

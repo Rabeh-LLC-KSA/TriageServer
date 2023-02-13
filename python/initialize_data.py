@@ -33,4 +33,6 @@ for line in f:
 	except ET.ParseError:
 		print 'err'
 	
+	
+	
 

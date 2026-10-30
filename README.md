@@ -1,5 +1,9 @@
 # TriageServer
 
+## Maintenance and verification
+
+Use the [maintenance guide](docs/maintenance.md) for change review, validation, release evidence, rollback and support handover. It supplements the setup and source reference with repository-specific checks and explicitly records what remains unverified.
+
 A legacy Express / EJS trajectory-data prototype. It queries a PostgreSQL log table by participant identifier and time range and includes data-import utilities.
 
 | Repository facts | Value |
@@ -33,3 +37,4 @@ This README is based on the repository source reviewed on 2026-10-28. It does no
 ## License
 
 No root license file was found in the reviewed tree. Confirm licensing with the repository owner before redistribution. Existing third-party licenses and notices remain applicable.
+

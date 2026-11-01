@@ -38,3 +38,7 @@ This README is based on the repository source reviewed on 2026-10-28. It does no
 
 No root license file was found in the reviewed tree. Confirm licensing with the repository owner before redistribution. Existing third-party licenses and notices remain applicable.
 
+
+## Release verification — 2026-11-01
+
+[Repository-specific validation and release evidence](docs/release-verification.md) lists the current commands, test entry points, acceptance cases, and rollback evidence for `master`. It complements the existing setup, architecture, API/configuration and operations documentation.

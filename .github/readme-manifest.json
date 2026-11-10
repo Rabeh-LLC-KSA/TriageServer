@@ -1,0 +1,10 @@
+{
+  "standard_version": "1.0.0",
+  "readmes": [
+    "README.md",
+    "docs/README.md"
+  ],
+  "excluded": {
+    "public/external/bootstrap/README.md": "Third-party Bootstrap upstream documentation; attribution and content preserved."
+  }
+}

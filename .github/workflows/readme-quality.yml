@@ -1,0 +1,33 @@
+name: README Quality
+
+on:
+  pull_request:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readme-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  readme-quality:
+    name: README metadata and links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test metadata updater and validation
+        run: python3 -m unittest discover -s .github/scripts -p test_readme_quality.py -v
+      - name: Validate managed READMEs
+        env:
+          README_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 .github/scripts/readme_quality.py --check

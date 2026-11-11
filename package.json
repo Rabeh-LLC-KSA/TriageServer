@@ -1,18 +1,31 @@
 {
   "name": "TriageServer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "import": "node init.js",
+    "test": "node --test test/*.test.js",
+    "build:css": "lessc public/stylesheets/style.less public/stylesheets/style.css",
+    "prestart": "npm run build:css"
   },
   "dependencies": {
-    "body-parser": "~1.12.0",
-    "cookie-parser": "~1.3.4",
-    "debug": "~2.1.1",
-    "ejs": "~2.3.1",
-    "express": "~4.12.2",
-    "less-middleware": "1.0.x",
-    "morgan": "~1.5.1",
-    "serve-favicon": "~2.2.0"
+    "cookie-parser": "^1.4.7",
+    "debug": "^4.3.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "serve-favicon": "^2.5.0",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "less": "^4.9.1",
+    "nodemon": "^3.1.7"
   }
 }

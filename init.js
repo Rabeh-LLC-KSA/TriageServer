@@ -1,82 +1,38 @@
-var     lazy = require("lazy"),
-fs = require("fs"),
-pg = require('pg'),
-xml2js = require('xml2js');
+'use strict';
 
-var conString = "postgres://tyler:tyler@localhost/tyler";
+/**
+ * One-off importer: loads initial_data/sim.xml (one <log .../> element per line)
+ * into the `log` table. Usage: DATABASE_URL=... npm run import
+ */
+require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
+const xml2js = require('xml2js');
+const { getPool } = require('./lib/db');
 
-//this starts initializes a connection pool
-//it will keep idle connections open for a (configurable) 30 seconds
-//and set a limit of 20 (also configurable)
+const file = process.argv[2] || path.join(__dirname, 'initial_data', 'sim.xml');
 
+async function main() {
+  const pool = getPool();
+  const rl = readline.createInterface({ input: fs.createReadStream(file), crlfDelay: Infinity });
+  let inserted = 0;
+  let skipped = 0;
 
-
-
-
-//region and timestep
-//person every step from time 1 to time 2
-
-
-//Trivial data storage    
-
-var parser = new xml2js.Parser();
-
-
-
-pg.connect(conString, function(err, client, done) {
-  if(err) {
-    return console.error('error fetching client from pool', err);
+  for await (const line of rl) {
+    if (!line.trim().startsWith('<log')) { skipped++; continue; }
+    try {
+      const result = await xml2js.parseStringPromise(line);
+      const a = result.log.$;
+      await pool.query('INSERT INTO log VALUES (DEFAULT, $1, $2, $3, $4)', [a.id, a.simstep, a.x, a.y]);
+      inserted++;
+    } catch (err) {
+      skipped++;
+      console.error('Skipping line:', err.message);
     }
- //(id,pid,time,x,y)
+  }
+  console.log(`Imported ${inserted} rows, skipped ${skipped}.`);
+  await pool.end();
+}
 
-
-
- var query = "INSERT INTO log VALUES (DEFAULT,$1,$2,$3,$4);"
-
- //console.log(query)
-
- new lazy(fs.createReadStream('initial_data/sim.xml'))
- .lines
- .forEach(function(line){
-     var line = line.toString();
-
-     parser.parseString(line, function (err, result) {
-        if(err){
-            console.log(err);
-        }
-        else {
-            client.query(query, [result.log.$.id,result.log.$.simstep,result.log.$.x,result.log.$.y], function(err, result) {
-                if(err) {
-                  return console.error('error running query', err);
-                }
-            });
-        }
-
-    });
- });
-
-
- 
-});
-
-
-
-
-
-
-// fs.readFile('initial_data/sim.xml', function(err, data) {
-//     parser.parseString(data, function (err, result) {
-//      if(err){
-//          console.log(err);
-//      }
-//      else {
-//          var logs = result.gpsLog.log;
-//          //insert each log
-//          logs.forEach(function(entry) {
-//              insertRow(entry)
-//          });
-//          //console.log('Done');
-//      }
-
-//     });
-// });
+main().catch((err) => { console.error(err); process.exit(1); });

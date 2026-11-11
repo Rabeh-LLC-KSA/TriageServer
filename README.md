@@ -11,8 +11,8 @@
 Your integrated platform in the world of financial technology, where opportunities meet investment.
 
 <!-- RABEH:README:START -->
-**README version:** `1.0.0` · **Last updated:** `2026-11-10`  
-**Last change:** Reorganized repository guidance; added the RABEH slogan, four-pillar map, documentation version and maintenance checks.
+**README version:** `1.1.0` · **Last updated:** `2026-11-11`  
+**Last change:** Documented environment configuration, setup, /path API, new npm scripts, Node >=20 and CI after runtime/security remediation.
 <!-- RABEH:README:END -->
 
 Documentation version is independent of application/package versions. [File history](https://github.com/Rabeh-LLC-KSA/TriageServer/commits/master/README.md).
@@ -49,7 +49,7 @@ The pillar map describes product ownership and intended integration. Repository 
 
 Historical Express / EJS trajectory-data prototype with PostgreSQL queries and data-import utilities.
 
-This public repository is a prototype, not an established RABEH investment-platform service. Runtime/import dependencies and embedded historical connection configuration require remediation before use.
+This public repository is a prototype, not an established RABEH investment-platform service. Runtime dependencies and connection configuration were remediated on 2026-11-11 (environment-based `DATABASE_URL`, declared dependencies, CI tests); it remains a prototype.
 
 | Repository fact | Value |
 | --- | --- |
@@ -74,7 +74,19 @@ git clone https://github.com/Rabeh-LLC-KSA/TriageServer.git
 cd TriageServer
 ```
 
-Use isolated non-production configuration. Preserve existing lockfiles, review dependency/install scripts, and resolve the documented missing dependencies before executing the service.
+```bash
+cp .env.example .env          # set DATABASE_URL to a local, non-production database
+npm ci
+psql "$DATABASE_URL" -f table_create.sql   # creates the log table (first statement)
+npm run import                # optional: load initial_data/sim.xml
+npm start                     # http://localhost:3000
+```
+
+Configuration is read only from the environment (`DATABASE_URL`, `PORT`, `NODE_ENV`, `PG_POOL_MAX`). No credentials are committed.
+
+### API
+
+`GET /path?pid=<id>&t1=<int>&t2=<int>` returns JSON points `{id, pid, time, x, y}` ordered by time. Invalid input returns `400`; database failures return `500` through the error handler.
 
 ## Runtime and versions
 
@@ -82,15 +94,20 @@ These are **declared requirements**, not a claim about the versions installed on
 
 | Component | Source declaration |
 | --- | --- |
-| express | ~4.12.2 |
-| Node engine | Not declared in package.json |
-| Manifest version | 0.0.0 |
+| express | ^4.21.2 |
+| pg | ^8.13.1 (connection pool) |
+| Node engine | >=20 (CI runs Node 22) |
+| Manifest version | 0.1.0 |
 
 ## Commands
 
 | Command | Manifest expansion | Effect / limit |
 | --- | --- | --- |
-| `npm run start` | `nodemon ./bin/www` | Declared command; not executed by this documentation review. |
+| `npm start` | `node ./bin/www` (runs `build:css` first) | Production-style start; requires `DATABASE_URL` for `/path`. |
+| `npm run dev` | `nodemon ./bin/www` | Local auto-reload. |
+| `npm run import` | `node init.js [file]` | Imports `initial_data/sim.xml` into the `log` table. |
+| `npm run build:css` | `lessc …style.less …style.css` | Compiles LESS at build time (replaces runtime less-middleware). |
+| `npm test` | `node --test test/*.test.js` | Input-validation and boot tests; run in CI. |
 
 ## Architecture and boundaries
 
@@ -131,4 +148,5 @@ Choose the next version and actual date; replace `README.md` with a nested guide
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 1.1.0 | 2026-11-11 | Documented environment configuration, setup, /path API, new npm scripts, Node >=20 and CI after runtime/security remediation. |
 | 1.0.0 | 2026-11-10 | Reorganized repository guidance; added the RABEH slogan, four-pillar map, documentation version and maintenance checks. |
